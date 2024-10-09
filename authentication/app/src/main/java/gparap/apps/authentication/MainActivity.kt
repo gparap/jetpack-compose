@@ -16,6 +16,7 @@
 package gparap.apps.authentication
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -37,8 +38,14 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -46,6 +53,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import gparap.apps.authentication.MainActivity.Companion.PASSWORD
+import gparap.apps.authentication.MainActivity.Companion.USERNAME
 import gparap.apps.authentication.ui.theme.MyAuthenticationAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -67,10 +76,23 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    companion object {
+        //constants that hold the test credential values for authentication
+        const val USERNAME = "gparap"
+        const val PASSWORD = "123456"
+    }
 }
 
 @Composable
 fun LoginForm() {
+    //state vars that hold the values for the text fields
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
+    //get the context that is provided by the nearest composable function that uses this property
+    val localContext = LocalContext.current
+
     MyAuthenticationAppTheme {
         //screen background
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.inverseOnSurface)
@@ -101,25 +123,27 @@ fun LoginForm() {
 
                 //username
                 TextField(
-                    value = "gparap",
-                    onValueChange = { },
+                    value = username,
+                    onValueChange = { username = it },
                     label = { Text("USERNAME") },
                     placeholder = { Text("Please, enter your username here...") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
+                        .testTag("usernameTextField")
                 )
 
                 //password
                 TextField(
                     visualTransformation = PasswordVisualTransformation(),
-                    value = "123456",
-                    onValueChange = { },
+                    value = password,
+                    onValueChange = { password = it },
                     label = { Text("PASSWORD") },
                     placeholder = { Text("Please, enter your password here...") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
+                        .testTag("passwordTextField")
                 )
 
                 //missed credentials
@@ -128,7 +152,16 @@ fun LoginForm() {
                 Spacer(modifier = Modifier.padding(16.dp))
 
                 //login button
-                Button(onClick = {}) {
+                Button(
+                    //authenticate with test credentials
+                    onClick = {
+                        if (username == USERNAME && password == PASSWORD) {
+                            Toast.makeText(localContext, localContext.getString(R.string.toast_authentication_succeed), Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(localContext, localContext.getString(R.string.toast_authentication_failed), Toast.LENGTH_SHORT).show()
+                        }
+                    }, modifier = Modifier.testTag("loginButton")
+                ) {
                     Text("Login")
                 }
             }
