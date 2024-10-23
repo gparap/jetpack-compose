@@ -15,7 +15,9 @@
  */
 package gparap.apps.bmi
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -26,9 +28,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -50,9 +53,124 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun Calculator() {
-    CalculatorPreview()
+    //state vars
+    var height by remember { mutableStateOf("") }
+    var weight by remember { mutableStateOf("") }
+    var bmi by remember { mutableFloatStateOf(0f) }
+    var category by remember { mutableStateOf("") }
+    val context = LocalContext.current
+
+    MyBMIApplicationTheme {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
+            //app label
+            Spacer(modifier = Modifier.absolutePadding(0.dp, 64.dp, 0.dp, 0.dp))
+            Row {
+                Text(
+                    "Body Mass Index Calculator", fontWeight = FontWeight.Bold, fontSize = 36.sp,
+                    textAlign = TextAlign.Center, lineHeight = 48.sp
+                )
+            }
+
+            //height input with label
+            Spacer(modifier = Modifier.padding(0.dp, 32.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "Enter height:", fontWeight = FontWeight.Normal, fontSize = 24.sp,
+                    modifier = Modifier.absolutePadding(16.dp, 0.dp, 8.dp, 0.dp)
+                )
+                TextField(
+                    modifier = Modifier.absolutePadding(0.dp, 0.dp, 16.dp, 0.dp),
+                    singleLine = true,
+                    value = height,
+                    label = { Text("meters", fontStyle = FontStyle.Italic) },
+                    onValueChange = { height = it },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+            }
+
+            //weight input with label
+            Spacer(modifier = Modifier.padding(0.dp, 16.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "Enter weight:", fontWeight = FontWeight.Normal, fontSize = 24.sp,
+                    modifier = Modifier.absolutePadding(16.dp, 0.dp, 8.dp, 0.dp)
+                )
+                TextField(
+                    modifier = Modifier.absolutePadding(0.dp, 0.dp, 16.dp, 0.dp),
+                    singleLine = true,
+                    value = weight,
+                    label = { Text("kilos", fontStyle = FontStyle.Italic) },
+                    onValueChange = { weight = it},
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+            }
+
+            //bmi result
+            Spacer(modifier = Modifier.padding(0.dp, 16.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "My BMI:", fontWeight = FontWeight.Normal, fontSize = 24.sp
+                )
+                Text(
+                    String.format("%.2f", bmi), fontWeight = FontWeight.Normal, fontSize = 24.sp,
+                    modifier = Modifier.absolutePadding(8.dp, 0.dp, 0.dp, 0.dp)
+                )
+            }
+
+            //category result
+            Spacer(modifier = Modifier.padding(0.dp, 16.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "Category:", fontWeight = FontWeight.Normal, fontSize = 24.sp
+                )
+                Text(
+                    category, fontWeight = FontWeight.Normal, fontSize = 24.sp,
+                    modifier = Modifier.absolutePadding(8.dp, 0.dp, 0.dp, 0.dp)
+                )
+            }
+
+            //calculate bmi button
+            Spacer(modifier = Modifier.padding(0.dp, 16.dp))
+            Button(onClick = {
+                //validate only not empty
+                if (height.isEmpty() || weight.isEmpty()) {
+                    Toast.makeText(context, "Please, enter values...", Toast.LENGTH_SHORT).show()
+                    return@Button
+                }
+
+                //calculate bmi
+                bmi = weight.toFloat() / (height.toFloat() * height.toFloat())
+
+                //find bmi category
+                category = if (bmi < 18.5) {
+                    "Underweight"
+                } else if (bmi > 18.5 && bmi < 25) {
+                    "Normal"
+                } else if (bmi > 25 && bmi < 30) {
+                    "Overweight"
+                } else {
+                    "Obese"
+                }
+            }) {
+                Text("find my bmi".uppercase())
+            }
+
+            //clear all input button
+            Spacer(modifier = Modifier.padding(0.dp, 0.dp))
+            Button(onClick = { height = ""; weight = ""; bmi = 0.0f; category = ""},
+                modifier = Modifier.absolutePadding(0.dp, 0.dp, 0.dp, 16.dp)) {
+                Text("clear".uppercase())
+            }
+        }
+    }
 }
 
 @Preview(showBackground = true)
@@ -95,7 +213,7 @@ fun CalculatorPreview() {
             Spacer(modifier = Modifier.padding(0.dp, 16.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    "Enter weight:", fontWeight = FontWeight.Normal, fontSize = 24.sp,
+                    "Enter height:", fontWeight = FontWeight.Normal, fontSize = 24.sp,
                     modifier = Modifier.absolutePadding(16.dp, 0.dp, 8.dp, 0.dp)
                 )
                 TextField(
