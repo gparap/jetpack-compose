@@ -26,6 +26,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,15 +36,46 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelProvider
 import gparap.apps.todo_list.ui.theme.MyTODOListAppTheme
+import gparap.apps.todo_list.viewmodels.MainActivityViewModel
 
 class MainActivity : ComponentActivity() {
+    private lateinit var viewModel: MainActivityViewModel
+    private val todoList = mutableListOf(
+        "todo #1", "todo #2", "todo #3", "todo #4", "todo #5", "todo #6", "todo #7", "todo #8",
+        "todo #9", "todo #10", "todo #11", "todo #12", "todo #13", "todo #14", "todo #15", "todo #16"
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        //get the view model for this activity
+        viewModel = ViewModelProvider(this)[MainActivityViewModel::class.java]
+        viewModel.setToToList(todoList)
+
         enableEdgeToEdge()
         setContent {
             MyTODOListAppTheme {
-                AppPreview()
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(0.dp, 0.dp, 0.dp, 0.dp)
+                ) {
+                    //always stays at the top
+                    AppTitle()
+
+                    //scrollable ToDoList
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Column(
+                            modifier = Modifier
+                                .verticalScroll(rememberScrollState())
+                                .fillMaxSize()
+                        ) {
+                            ToDoList(viewModel)
+                        }
+                    }
+                }
             }
         }
     }
@@ -62,24 +95,15 @@ fun AppTitle() {
 }
 
 @Composable
-fun ToDoList() {
+fun ToDoList(viewModel: MainActivityViewModel) {
+    //observe the todoList items LiveData from the ViewModel
+    val todoListItems by viewModel.getToDoList().observeAsState(emptyList())
+
+    //display todoList items
     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
-        //create a test list of ToDoItems
-        ToDoItem("todo #1")
-        ToDoItem("todo #2")
-        ToDoItem("todo #3")
-        ToDoItem("todo #4")
-        ToDoItem("todo #5")
-        ToDoItem("todo #6")
-        ToDoItem("todo #7")
-        ToDoItem("todo #8")
-        ToDoItem("todo #9")
-        ToDoItem("todo #11")
-        ToDoItem("todo #12")
-        ToDoItem("todo #13")
-        ToDoItem("todo #14")
-        ToDoItem("todo #15")
-        ToDoItem("todo #16")
+        todoListItems.forEach { todoListItem ->
+            ToDoItem(todoListItem)
+        }
     }
 }
 
@@ -119,7 +143,11 @@ fun AppPreview() {
                     .verticalScroll(rememberScrollState())
                     .fillMaxSize()
             ) {
-                ToDoList()
+                ToDoItem("todo #1")
+                ToDoItem("todo #2")
+                ToDoItem("todo #3")
+                //..more ToDoItems
+                ToDoItem("todo #n")
             }
         }
     }
