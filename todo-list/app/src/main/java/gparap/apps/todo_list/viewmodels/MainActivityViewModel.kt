@@ -17,14 +17,32 @@ package gparap.apps.todo_list.viewmodels
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import gparap.apps.todo_list.data.ToDoModel
 
 class MainActivityViewModel : ViewModel() {
-    private val todoList = MutableLiveData<List<String>>(emptyList())
-    fun getToDoList(): MutableLiveData<List<String>> {
+    private val todoList = MutableLiveData<List<ToDoModel>>(emptyList())
+    fun getToDoList(): MutableLiveData<List<ToDoModel>> {
         return todoList
     }
 
-    fun setToToList(todoList: List<String>) {
+    fun setToToList(todoList: List<ToDoModel>) {
         this.todoList.value = todoList
+    }
+
+    fun deleteToDoItem(position: Int) {
+        val currentList = todoList.value ?: return
+        val updatedList = currentList.toMutableList().apply {
+            removeAt(position)
+        }
+        //update the positions of the items after the removed one
+        updatedList.forEach { item ->
+            run {
+                if (item.position > position) {
+                    item.position -= 1
+                }
+            }
+        }
+        //update the MutableLiveData
+        todoList.value = updatedList
     }
 }

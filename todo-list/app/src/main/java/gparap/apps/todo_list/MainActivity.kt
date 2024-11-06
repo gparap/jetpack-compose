@@ -19,11 +19,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,14 +34,29 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
+import gparap.apps.todo_list.data.ToDoModel
 import gparap.apps.todo_list.ui.theme.MyTODOListAppTheme
 import gparap.apps.todo_list.viewmodels.MainActivityViewModel
 
 class MainActivity : ComponentActivity() {
     private lateinit var viewModel: MainActivityViewModel
-    private val todoList = mutableListOf(
-        "todo #1", "todo #2", "todo #3", "todo #4", "todo #5", "todo #6", "todo #7", "todo #8",
-        "todo #9", "todo #10", "todo #11", "todo #12", "todo #13", "todo #14", "todo #15", "todo #16"
+    private var todoList = mutableListOf(   //TODO: remove test list after adding todos functionality
+        ToDoModel("todo #1", 0),
+        ToDoModel("todo #2", 1),
+        ToDoModel("todo #3", 2),
+        ToDoModel("todo #4", 3),
+        ToDoModel("todo #5", 4),
+        ToDoModel("todo #6", 5),
+        ToDoModel("todo #7", 6),
+        ToDoModel("todo #8", 7),
+        ToDoModel("todo #9", 8),
+        ToDoModel("todo #10", 9),
+        ToDoModel("todo #11", 10),
+        ToDoModel("todo #12", 11),
+        ToDoModel("todo #13", 12),
+        ToDoModel("todo #14", 13),
+        ToDoModel("todo #15", 14),
+        ToDoModel("todo #16", 15)
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,13 +114,13 @@ fun ToDoList(viewModel: MainActivityViewModel) {
     //display todoList items
     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
         todoListItems.forEach { todoListItem ->
-            ToDoItem(todoListItem)
+            ToDoItem(todoListItem, viewModel)
         }
     }
 }
 
 @Composable
-fun ToDoItem(name: String) {
+fun ToDoItem(toDoItem: ToDoModel, viewModel: MainActivityViewModel) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -121,7 +133,15 @@ fun ToDoItem(name: String) {
             painter = painterResource(R.drawable.ic_launcher_foreground), "TODO image",
             modifier = Modifier.size(48.dp, 48.dp)
         )
-        Text("TODO: $name")
+        Text("TODO: ${toDoItem.name}")
+        Spacer(modifier = Modifier.padding(64.dp, 0.dp, 0.dp, 0.dp))
+        Image(painter = painterResource(R.drawable.ic_delete_24px), "Delete TODO item",
+            modifier = Modifier
+                .size(24.dp, 24.dp)
+                .clickable {
+                    viewModel.deleteToDoItem(toDoItem.position)
+                }
+        )
     }
 }
 
@@ -143,12 +163,35 @@ fun AppPreview() {
                     .verticalScroll(rememberScrollState())
                     .fillMaxSize()
             ) {
-                ToDoItem("todo #1")
-                ToDoItem("todo #2")
-                ToDoItem("todo #3")
+                Text("todo #1")
+                Text("todo #2")
                 //..more ToDoItems
-                ToDoItem("todo #n")
+                Text("todo #3")
             }
         }
+    }
+}
+
+@Composable
+@Preview
+fun ToDoItemPreview() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .background(color = Color.LightGray),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Image(
+            painter = painterResource(R.drawable.ic_launcher_foreground), "TODO image",
+            modifier = Modifier.size(48.dp, 48.dp)
+        )
+        Text("TODO: todo #1")
+        Spacer(modifier = Modifier.padding(64.dp, 0.dp, 0.dp, 0.dp))
+        Image(
+            painter = painterResource(R.drawable.ic_delete_24px), "Delete TODO item",
+            modifier = Modifier.size(24.dp, 24.dp)
+        )
     }
 }
