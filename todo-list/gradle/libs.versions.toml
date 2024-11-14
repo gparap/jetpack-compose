@@ -3,15 +3,22 @@
 agp = "8.6.0-alpha07"
 #noinspection GradleDependency
 kotlin = "1.9.0"
+#noinspection GradleDependency
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
+#noinspection GradleDependency
 lifecycleRuntimeKtx = "2.8.6"
 activityCompose = "1.9.3"
 #noinspection GradleDependency
 composeBom = "2024.04.01"
+#noinspection GradleDependency
 runtimeLivedata = "1.7.4"
+#noinspection GradleDependency
+navigationRuntimeKtx = "2.8.3"
+#noinspection GradleDependency
+navigationCompose = "2.8.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -29,6 +36,8 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
+androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
