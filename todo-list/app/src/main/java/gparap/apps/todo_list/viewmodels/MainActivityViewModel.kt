@@ -25,8 +25,8 @@ class MainActivityViewModel : ViewModel() {
         return todoList
     }
 
-    fun setToToList(todoList: List<ToDoModel>) {
-        this.todoList.value = todoList
+    fun setToToList(todoList: MutableLiveData<List<ToDoModel>>) {
+        this.todoList.value = todoList.value
     }
 
     fun deleteToDoItem(position: Int) {
@@ -41,6 +41,15 @@ class MainActivityViewModel : ViewModel() {
                     item.position -= 1
                 }
             }
+        }
+        //update the MutableLiveData
+        todoList.value = updatedList
+    }
+
+    fun addToDoItem(todoItem: ToDoModel) {
+        val currentList = todoList.value ?: return
+        val updatedList = currentList.toMutableList().apply {
+            add(todoItem)
         }
         //update the MutableLiveData
         todoList.value = updatedList

@@ -47,31 +47,13 @@ import gparap.apps.todo_list.viewmodels.MainActivityViewModel
 
 class MainActivity : ComponentActivity() {
     private lateinit var viewModel: MainActivityViewModel
-    private var todoList = mutableListOf(   //TODO: remove test list after adding todos functionality
-        ToDoModel("todo #1", 0),
-        ToDoModel("todo #2", 1),
-        ToDoModel("todo #3", 2),
-        ToDoModel("todo #4", 3),
-        ToDoModel("todo #5", 4),
-        ToDoModel("todo #6", 5),
-        ToDoModel("todo #7", 6),
-        ToDoModel("todo #8", 7),
-        ToDoModel("todo #9", 8),
-        ToDoModel("todo #10", 9),
-        ToDoModel("todo #11", 10),
-        ToDoModel("todo #12", 11),
-        ToDoModel("todo #13", 12),
-        ToDoModel("todo #14", 13),
-        ToDoModel("todo #15", 14),
-        ToDoModel("todo #16", 15)
-    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         //get the view model for this activity
         viewModel = ViewModelProvider(this)[MainActivityViewModel::class.java]
-        viewModel.setToToList(todoList)
+        viewModel.setToToList(viewModel.getToDoList())
 
         enableEdgeToEdge()
         setContent {
@@ -113,7 +95,7 @@ fun AppNav(viewModel: MainActivityViewModel) {
         //1st screen: ToDoList
         composable("navRoute_ToDoListScreen") { ToDoList(viewModel, navController) }
         //2nd screen: AddToDo
-        composable("navRoute_AddToDoItemScreen") { AddToDoItem(navController) }
+        composable("navRoute_AddToDoItemScreen") { AddToDoItem(viewModel, navController) }
     }
 }
 
@@ -165,7 +147,7 @@ fun ToDoList(viewModel: MainActivityViewModel, navController: NavController) {
 }
 
 @Composable
-fun AddToDoItem(navController: NavController) {
+fun AddToDoItem(viewModel: MainActivityViewModel, navController: NavController) {
     var todoName by remember { mutableStateOf("") }
 
     //add todoItem screen
@@ -206,6 +188,13 @@ fun AddToDoItem(navController: NavController) {
                 } else {
                     Toast.makeText(navController.context, "Your TODO was added!", Toast.LENGTH_SHORT).show()
                 }
+
+                //get the size of the todoList to find the position
+                val size = viewModel.getToDoList().value?.size
+                val todoPosition = size ?: 0
+
+                //add todoItem
+                viewModel.addToDoItem(ToDoModel(todoName, todoPosition))
 
                 //navigate back to the ToDoList
                 navController.navigate("navRoute_ToDoListScreen")
